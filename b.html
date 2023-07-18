@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>H5画板示例</title>
+	<style>
+		canvas {
+			border: 1px solid #000;
+			margin-bottom: 20px;
+		}
+
+		input[type="range"] {
+			display: block;
+			margin-bottom: 20px;
+		}
+
+		.color-button {
+			display: inline-block;
+			width: 30px;
+			height: 30px;
+			margin-right: 10px;
+			border-radius: 50%;
+			cursor: pointer;
+			box-shadow: 0 0 0 1px #000;
+		}
+
+		#color-input {
+			display: none;
+		}
+
+		#color-preview {
+			display: inline-block;
+			width: 30px;
+			height: 30px;
+			background-color: #000;
+			margin-left: 10px;
+			border-radius: 50%;
+			border: 1px solid #000;
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body>
+	<!-- 添加画笔大小调节器和颜色选择器 -->
+	<label>画笔大小：<input type="range" id="brushSize" min="1" max="50" value="10"></label>
+
+	<div id="colorPalette">
+		<div class="color-button" style="background-color: #000;" data-color="#000"></div>
+		<div class="color-button" style="background-color: #f00;" data-color="#f00"></div>
+		<div class="color-button" style="background-color: #0f0;" data-color="#0f0"></div>
+		<div class="color-button" style="background-color: #00f;" data-color="#00f"></div>
+		<div class="color-button" style="background-color: #ff0;" data-color="#ff0"></div>
+		<div class="color-button" style="background-color: #f0f;" data-color="#f0f"></div>
+		<div class="color-button" style="background-color: #0ff;" data-color="#0ff"></div>
+		<div class="color-button" id="custom-color-button"></div>
+		<input type="text" id="color-input" placeholder="请输入颜色编号">
+		<div id="color-preview"></div>
+	</div>
+
+	<!-- 添加橡皮擦开关 -->
+	<label>橡皮擦：<input type="checkbox" id="eraser"></label>
+
+	<canvas id="myCanvas" width="400" height="400"></canvas>
+
+	<script>
+		var canvas = document.getElementById("myCanvas");
+		var ctx = canvas.getContext("2d");
+
+		var painting = false;
+
+		// 设置画笔颜色为黑色
+		ctx.strokeStyle = "#000";
+
+		var brushSize = 10; // 默认画笔大小为10
+
+		// 获取画笔大小调节器、颜色选择器和橡皮擦开关
+		var brushSizeInput = document.getElementById("brushSize");
+		var colorPalette = document.getElementById("colorPalette");
+		var eraserCheckbox = document.getElementById("eraser");
+
+		// 根据橡皮擦开关设置画笔颜色
+		function setBrushColor() {
+			if (eraserCheckbox.checked) {
+				ctx.strokeStyle = "#fff"; // 设置画笔颜色为白色，实现橡皮擦功能
+			} else {
+				ctx.strokeStyle = colorPalette.dataset.color; // 获取当前选中的颜色值，设置画笔颜色
+			}
+		}
+
+		// 开始绘制路径
+		function startPainting(e) {
+			painting = true;
+			draw(e);
+		}
+
+		// 停止绘制路径
+		function stopPainting() {
+			painting = false;
+			ctx.beginPath();
+		}
+
+		// 绘制路径
+		function draw(e) {
+			if (!painting) return;
+
+			setBrushColor(); // 根据橡皮擦开关设置画笔颜色
+
+			// 获取当前画笔大小
+
+			// 获取当前画笔大小
+			brushSize = brushSizeInput.value;
+
+			ctx.lineWidth = brushSize;
+			ctx.lineCap = "round";
+			ctx.lineTo(getX(e), getY(e));
+			ctx.stroke();
+			ctx.beginPath();
+			ctx.moveTo(getX(e), getY(e));
+		}
+
+		// 获取鼠标或触摸点的坐标
+		function getXY(e) {
+			var rect = canvas.getBoundingClientRect();
+			var scaleX = canvas.width / rect.width;
+			var scaleY = canvas.height / rect.height;
+			return {
+				x: (e.clientX - rect.left) * scaleX,
+				y: (e.clientY - rect.top) * scaleY
+			};
+		}
+
+		// 获取鼠标或触摸点的x坐标
+		function getX(e) {
+			return getXY(e).x;
+		}
+
+		// 获取鼠标或触摸点的y坐标
+		function getY(e) {
+			return getXY(e).y;
+		}
+
+		// 添加事件监听器，以响应鼠标或触摸事件
+		canvas.addEventListener("mousedown", startPainting);
+		canvas.addEventListener("mouseup", stopPainting);
+		canvas.addEventListener("mousemove", draw);
+		canvas.addEventListener("touchstart", startPainting);
+		canvas.addEventListener("touchend", stopPainting);
+		canvas.addEventListener("touchmove", draw);
+
+		// 添加事件监听器，以响应画笔大小调节器的变化
+		brushSizeInput.addEventListener("change", function() {
+			setBrushColor(); // 根据橡皮擦开关设置画笔颜色
+		});
+
+		// 添加事件监听器，以响应橡皮擦开关的变化
+		eraserCheckbox.addEventListener("change", function() {
+			setBrushColor(); // 根据橡皮擦开关设置画笔颜色
+		});
+	</script>
+</body>
+</html
